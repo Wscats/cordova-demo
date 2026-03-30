@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -19,17 +21,17 @@
 
 /*jshint node: true*/
 
-var Q     = require('q'),
+const Q     = require('q'),
     path  = require('path'),
     shell = require('shelljs'),
     spawn = require('./spawn'),
     check_reqs = require('./check_reqs'),
     fs = require('fs');
 
-var events = require('cordova-common').events;
+const events = require('cordova-common').events;
 
-var projectPath = path.join(__dirname, '..', '..');
-var projectName = null;
+const projectPath = path.join(__dirname, '..', '..');
+let projectName = null;
 
 module.exports.run = function (buildOpts) {
 
@@ -48,11 +50,11 @@ module.exports.run = function (buildOpts) {
             return Q.reject('Build config file does not exist:' + buildOpts.buildConfig);
         }
         events.emit('log','Reading build config file:', path.resolve(buildOpts.buildConfig));
-        var contents = fs.readFileSync(buildOpts.buildConfig, 'utf-8');
-        var buildConfig = JSON.parse(contents.replace(/^\ufeff/, '')); // Remove BOM
+        const contents = fs.readFileSync(buildOpts.buildConfig, 'utf-8');
+        const buildConfig = JSON.parse(contents.replace(/^\ufeff/, '')); // Remove BOM
         if(buildConfig.ios) {
-            var buildType = buildOpts.release ? 'release' : 'debug';
-            var config = buildConfig.ios[buildType];
+            const buildType = buildOpts.release ? 'release' : 'debug';
+            const config = buildConfig.ios[buildType];
             if(config) {
                 ['codeSignIdentity', 'codeSignResourceRules', 'provisioningProfile'].forEach(
                     function(key) {
@@ -66,7 +68,7 @@ module.exports.run = function (buildOpts) {
         return findXCodeProjectIn(projectPath);
     }).then(function (name) {
         projectName = name;
-        var extraConfig = '';
+        const extraConfig = '';
         if (buildOpts.codeSignIdentity) {
             extraConfig += 'CODE_SIGN_IDENTITY = ' + buildOpts.codeSignIdentity + '\n';
             extraConfig += 'CODE_SIGN_IDENTITY[sdk=iphoneos*] = ' + buildOpts.codeSignIdentity + '\n';
@@ -79,22 +81,22 @@ module.exports.run = function (buildOpts) {
         }
         return Q.nfcall(fs.writeFile, path.join(__dirname, '..', 'build-extras.xcconfig'), extraConfig, 'utf-8');
     }).then(function () {
-        var configuration = buildOpts.release ? 'Release' : 'Debug';
+        const configuration = buildOpts.release ? 'Release' : 'Debug';
 
         events.emit('log','Building project: ' + path.join(projectPath, projectName + '.xcodeproj'));
         events.emit('log','\tConfiguration: ' + configuration);
         events.emit('log','\tPlatform: ' + (buildOpts.device ? 'device' : 'emulator'));
 
-        var xcodebuildArgs = getXcodeArgs(projectName, projectPath, configuration, buildOpts.device);
+        let xcodebuildArgs = getXcodeArgs(projectName, projectPath, configuration, buildOpts.device);
         return spawn('xcodebuild', xcodebuildArgs, projectPath);
     }).then(function () {
         if (!buildOpts.device || buildOpts.noSign) {
             return;
         }
-        var buildOutputDir = path.join(projectPath, 'build', 'device');
-        var pathToApp = path.join(buildOutputDir, projectName + '.app');
-        var pathToIpa = path.join(buildOutputDir, projectName + '.ipa');
-        var xcRunArgs = ['-sdk', 'iphoneos', 'PackageApplication',
+        const buildOutputDir = path.join(projectPath, 'build', 'device');
+        const pathToApp = path.join(buildOutputDir, projectName + '.app');
+        const pathToIpa = path.join(buildOutputDir, projectName + '.ipa');
+        const xcRunArgs = ['-sdk', 'iphoneos', 'PackageApplication',
             '-v', pathToApp,
             '-o', pathToIpa];
         if (buildOpts.codeSignIdentity) {
@@ -114,7 +116,7 @@ module.exports.run = function (buildOpts) {
  */
 function findXCodeProjectIn(projectPath) {
     // 'Searching for Xcode project in ' + projectPath);
-    var xcodeProjFiles = shell.ls(projectPath).filter(function (name) {
+    const xcodeProjFiles = shell.ls(projectPath).filter(function (name) {
         return path.extname(name) === '.xcodeproj';
     });
 
@@ -126,7 +128,7 @@ function findXCodeProjectIn(projectPath) {
             projectPath + '\nUsing first one');
     }
 
-    var projectName = path.basename(xcodeProjFiles[0], '.xcodeproj');
+    const projectName = path.basename(xcodeProjFiles[0], '.xcodeproj');
     return Q.resolve(projectName);
 }
 

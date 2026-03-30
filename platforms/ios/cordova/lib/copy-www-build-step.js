@@ -1,3 +1,5 @@
+'use strict';
+
 #!/usr/bin/env node
 
 /*
@@ -24,12 +26,12 @@
 // This script should not be called directly.
 // It is called as a build step from Xcode.
 
-var BUILT_PRODUCTS_DIR = process.env.BUILT_PRODUCTS_DIR,
+const BUILT_PRODUCTS_DIR = process.env.BUILT_PRODUCTS_DIR,
     FULL_PRODUCT_NAME = process.env.FULL_PRODUCT_NAME,
     COPY_HIDDEN = process.env.COPY_HIDDEN,
     PROJECT_FILE_PATH = process.env.PROJECT_FILE_PATH;
 
-var path = require('path'),
+const path = require('path'),
     fs = require('fs'),
     shell = require('shelljs'),
     srcDir = 'www',

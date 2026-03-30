@@ -1,3 +1,5 @@
+'use strict';
+
 /*
        Licensed to the Apache Software Foundation (ASF) under one
        or more contributor license agreements.  See the NOTICE file
@@ -19,17 +21,17 @@
 
 /*jshint node: true*/
 
-var Q = require('q'),
+const Q = require('q'),
     path   = require('path'),
     iossim = require('ios-sim'),
     build  = require('./build'),
     spawn  = require('./spawn'),
     check_reqs = require('./check_reqs');
 
-var events = require('cordova-common').events;
+const events = require('cordova-common').events;
 
-var cordovaPath = path.join(__dirname, '..');
-var projectPath = path.join(__dirname, '..', '..');
+const cordovaPath = path.join(__dirname, '..');
+const projectPath = path.join(__dirname, '..', '..');
 
 module.exports.run = function (runOptions) {
 
@@ -48,7 +50,7 @@ module.exports.run = function (runOptions) {
         });
     }
 
-    var useDevice = !!runOptions.device;
+    let useDevice = !!runOptions.device;
 
     return require('./list-devices').run()
     .then(function (devices) {
@@ -68,7 +70,7 @@ module.exports.run = function (runOptions) {
     }).then(function () {
         return build.findXCodeProjectIn(projectPath);
     }).then(function (projectName) {
-        var appPath = path.join(projectPath, 'build', 'emulator', projectName + '.app');
+        let appPath = path.join(projectPath, 'build', 'emulator', projectName + '.app');
         // select command to run and arguments depending whether
         // we're running on device/emulator
         if (useDevice) {
@@ -92,14 +94,14 @@ module.exports.run = function (runOptions) {
  * @return {Array} array with unsupported args for the 'run' command
  */
 function filterSupportedArgs(args) {
-        var filtered = [];
-        var sargs = ['--device', '--emulator', '--nobuild', '--list', '--target', '--debug', '--release'];
-        var re = new RegExp(sargs.join('|'));
+        const filtered = [];
+        const sargs = ['--device', '--emulator', '--nobuild', '--list', '--target', '--debug', '--release'];
+        const re = new RegExp(sargs.join('|'));
 
         args.forEach(function(element) {
             // supported args not found, we add
             // we do a regex search because --target can be "--target=XXX"
-            if (element.search(re) == -1) {
+            if (element.search(re) === -1) {
                 filtered.push(element);
             }
         }, this);
@@ -158,7 +160,7 @@ function deployToSim(appPath, target) {
 }
 
 function startSim(appPath, target) {
-    var logPath = path.join(cordovaPath, 'console.log');
+    const logPath = path.join(cordovaPath, 'console.log');
 
     return iossim.launch(appPath, 'com.apple.CoreSimulator.SimDeviceType.' + target, logPath, '--exit');
 }

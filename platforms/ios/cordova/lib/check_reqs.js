@@ -1,3 +1,5 @@
+'use strict';
+
 /*
        Licensed to the Apache Software Foundation (ASF) under one
        or more contributor license agreements.  See the NOTICE file
@@ -17,16 +19,16 @@
        under the License.
 */
 
-var Q     = require('q'),
+const Q     = require('q'),
     shell = require('shelljs'),
     versions = require('./versions');
 
-var XCODEBUILD_MIN_VERSION = '6.0.0';
-var XCODEBUILD_NOT_FOUND_MESSAGE =
+const XCODEBUILD_MIN_VERSION = '6.0.0';
+const XCODEBUILD_NOT_FOUND_MESSAGE =
     'Please install version ' + XCODEBUILD_MIN_VERSION + ' or greater from App Store';
 
-var IOS_DEPLOY_MIN_VERSION = '1.8.3';
-var IOS_DEPLOY_NOT_FOUND_MESSAGE =
+const IOS_DEPLOY_MIN_VERSION = '1.8.3';
+const IOS_DEPLOY_NOT_FOUND_MESSAGE =
     'Please download, build and install version ' + IOS_DEPLOY_MIN_VERSION + ' or greater' +
     ' from https://github.com/phonegap/ios-deploy into your path, or do \'npm install -g ios-deploy\'';
 
@@ -62,7 +64,7 @@ module.exports.check_os = function () {
  */
 function checkTool (tool, minVersion, message) {
     // Check whether tool command is available at all
-    var tool_command = shell.which(tool);
+    const tool_command = shell.which(tool);
     if (!tool_command) {
         return Q.reject(tool + ' was not found. ' + (message || ''));
     }
@@ -83,7 +85,7 @@ function checkTool (tool, minVersion, message) {
  * @param {Boolean} isFatal   Marks the requirement as fatal. If such requirement will fail
  *                            next requirements' checks will be skipped.
  */
-var Requirement = function (id, name, isFatal) {
+const Requirement = function (id, name, isFatal) {
     this.id = id;
     this.name = name;
     this.installed = false;
@@ -99,16 +101,16 @@ var Requirement = function (id, name, isFatal) {
  */
 module.exports.check_all = function() {
 
-    var requirements = [
+    const requirements = [
         new Requirement('os', 'Apple OS X', true),
         new Requirement('xcode', 'Xcode'),
         new Requirement('ios-deploy', 'ios-deploy')
     ];
 
-    var result = [];
-    var fatalIsHit = false;
+    const result = [];
+    let fatalIsHit = false;
 
-    var checkFns = [
+    const checkFns = [
         module.exports.check_os,
         module.exports.check_xcodebuild,
         module.exports.check_ios_deploy
@@ -121,7 +123,7 @@ module.exports.check_all = function() {
             // we don't need to check others
             if (fatalIsHit) return Q();
 
-            var requirement = requirements[idx];
+            const requirement = requirements[idx];
             return checkFn()
             .then(function (version) {
                 requirement.installed = true;

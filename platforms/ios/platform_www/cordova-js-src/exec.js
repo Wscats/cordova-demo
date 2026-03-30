@@ -1,3 +1,5 @@
+'use strict';
+
 /*
  *
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -25,7 +27,7 @@
  * Creates a gap bridge iframe used to notify the native code about queued
  * commands.
  */
-var cordova = require('cordova'),
+const cordova = require('cordova'),
     utils = require('cordova/utils'),
     base64 = require('cordova/base64'),
     execIframe,
@@ -34,12 +36,12 @@ var cordova = require('cordova'),
     failSafeTimerId = 0;
 
 function massageArgsJsToNative(args) {
-    if (!args || utils.typeName(args) != 'Array') {
+    if (!args || utils.typeName(args) !== 'Array') {
         return args;
     }
-    var ret = [];
+    let ret = [];
     args.forEach(function(arg, i) {
-        if (utils.typeName(arg) == 'ArrayBuffer') {
+        if (utils.typeName(arg) === 'ArrayBuffer') {
             ret.push({
                 'CDVType': 'ArrayBuffer',
                 'data': base64.fromArrayBuffer(arg)
@@ -52,15 +54,15 @@ function massageArgsJsToNative(args) {
 }
 
 function massageMessageNativeToJs(message) {
-    if (message.CDVType == 'ArrayBuffer') {
-        var stringToArrayBuffer = function(str) {
-            var ret = new Uint8Array(str.length);
-            for (var i = 0; i < str.length; i++) {
+    if (message.CDVType === 'ArrayBuffer') {
+        const stringToArrayBuffer = function(str) {
+            const ret = new Uint8Array(str.length);
+            for (let i = 0; i < str.length; i++) {
                 ret[i] = str.charCodeAt(i);
             }
             return ret.buffer;
         };
-        var base64ToArrayBuffer = function(b64) {
+        const base64ToArrayBuffer = function(b64) {
             return stringToArrayBuffer(atob(b64));
         };
         message = base64ToArrayBuffer(message.data);
@@ -69,10 +71,10 @@ function massageMessageNativeToJs(message) {
 }
 
 function convertMessageToArgsNativeToJs(message) {
-    var args = [];
+    let args = [];
     if (!message || !message.hasOwnProperty('CDVType')) {
         args.push(message);
-    } else if (message.CDVType == 'MultiPart') {
+    } else if (message.CDVType === 'MultiPart') {
         message.messages.forEach(function(e) {
             args.push(massageMessageNativeToJs(e));
         });
@@ -85,7 +87,7 @@ function convertMessageToArgsNativeToJs(message) {
 function iOSExec() {
 
     var successCallback, failCallback, service, action, actionArgs;
-    var callbackId = null;
+    let callbackId = null;
     if (typeof arguments[0] !== 'string') {
         // FORMAT ONE
         successCallback = arguments[0];
@@ -118,7 +120,7 @@ function iOSExec() {
 
     actionArgs = massageArgsJsToNative(actionArgs);
 
-    var command = [callbackId, service, action, actionArgs];
+    let command = [callbackId, service, action, actionArgs];
 
     // Stringify and queue the command. We stringify to command now to
     // effectively clone the command arguments in case they are mutated before
@@ -129,14 +131,14 @@ function iOSExec() {
     // then the queue will be flushed when it returns; no need for a poke.
     // Also, if there is already a command in the queue, then we've already
     // poked the native side, so there is no reason to do so again.
-    if (!isInContextOfEvalJs && commandQueue.length == 1) {
+    if (!isInContextOfEvalJs && commandQueue.length === 1) {
         pokeNative();
     }
 }
 
 // CB-10530
 function proxyChanged() {
-    var cexec = cordovaExec();
+    let cexec = cordovaExec();
        
     return (execProxy !== cexec && // proxy objects are different
             iOSExec !== cexec      // proxy object is not the current iOSExec
@@ -146,14 +148,14 @@ function proxyChanged() {
 // CB-10106
 function handleBridgeChange() {
     if (proxyChanged()) {
-        var commandString = commandQueue.shift();
+        let commandString = commandQueue.shift();
         while(commandString) {
-            var command = JSON.parse(commandString);
-            var callbackId = command[0];
-            var service = command[1];
-            var action = command[2];
-            var actionArgs = command[3];
-            var callbacks = cordova.callbacks[callbackId] || {};
+            const command = JSON.parse(commandString);
+            const callbackId = command[0];
+            const service = command[1];
+            const action = command[2];
+            const actionArgs = command[3];
+            const callbacks = cordova.callbacks[callbackId] || {};
             
             execProxy(callbacks.success, callbacks.fail, service, action, actionArgs);
             
@@ -208,15 +210,15 @@ iOSExec.nativeFetchMessages = function() {
     if (!commandQueue.length) {
         return '';
     }
-    var json = '[' + commandQueue.join(',') + ']';
+    const json = '[' + commandQueue.join(',') + ']';
     commandQueue.length = 0;
     return json;
 };
 
 iOSExec.nativeCallback = function(callbackId, status, message, keepCallback, debug) {
     return iOSExec.nativeEvalAndFetch(function() {
-        var success = status === 0 || status === 1;
-        var args = convertMessageToArgsNativeToJs(message);
+        const success = status === 0 || status === 1;
+        const args = convertMessageToArgsNativeToJs(message);
         function nc2() {
             cordova.callbackFromNative(callbackId, success, status, args, keepCallback);
         }
@@ -238,8 +240,8 @@ iOSExec.nativeEvalAndFetch = function(func) {
 // Proxy the exec for bridge changes. See CB-10106
 
 function cordovaExec() {
-    var cexec = require('cordova/exec');
-    var cexec_valid = (typeof cexec.nativeFetchMessages === 'function') && (typeof cexec.nativeEvalAndFetch === 'function') && (typeof cexec.nativeCallback === 'function');
+    const cexec = require('cordova/exec');
+    const cexec_valid = (typeof cexec.nativeFetchMessages === 'function') && (typeof cexec.nativeEvalAndFetch === 'function') && (typeof cexec.nativeCallback === 'function');
     return (cexec_valid && execProxy !== cexec)? cexec : iOSExec;
 }
 

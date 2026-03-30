@@ -1,3 +1,5 @@
+'use strict';
+
 // Platform: ios
 // 2fd4bcb84048415922d13d80d35b8d1668e8e150
 /*
@@ -19,7 +21,7 @@
  under the License.
 */
 ;(function() {
-var PLATFORM_VERSION_BUILD_LABEL = '4.2.0';
+const PLATFORM_VERSION_BUILD_LABEL = '4.2.0';
 // file: src/scripts/require.js
 
 /*jshint -W079 */
@@ -29,7 +31,7 @@ var require,
     define;
 
 (function () {
-    var modules = {},
+    const modules = {},
     // Stack of moduleIds currently being built.
         requireStack = [],
     // Map of module ID -> index into requireStack of modules currently being built.
@@ -39,9 +41,9 @@ var require,
 
 
     function build(module) {
-        var factory = module.factory,
+        const factory = module.factory,
             localRequire = function (id) {
-                var resultantId = id;
+                let resultantId = id;
                 //Its a relative path, so lop off the last portion and add the id (minus "./")
                 if (id.charAt(0) === ".") {
                     resultantId = module.id.slice(0, module.id.lastIndexOf(SEPARATOR)) + SEPARATOR + id.slice(2);
@@ -58,7 +60,7 @@ var require,
         if (!modules[id]) {
             throw "module " + id + " not found";
         } else if (id in inProgressModules) {
-            var cycle = requireStack.slice(inProgressModules[id]).join('->') + '->' + id;
+            const cycle = requireStack.slice(inProgressModules[id]).join('->') + '->' + id;
             throw "Cycle in require graph: " + cycle;
         }
         if (modules[id].factory) {
@@ -108,28 +110,28 @@ if (window.cordova && !(window.cordova instanceof HTMLElement)) {
 }
 
 
-var channel = require('cordova/channel');
-var platform = require('cordova/platform');
+let channel = require('cordova/channel');
+let platform = require('cordova/platform');
 
 
 /**
  * Intercept calls to addEventListener + removeEventListener and handle deviceready,
  * resume, and pause events.
  */
-var m_document_addEventListener = document.addEventListener;
-var m_document_removeEventListener = document.removeEventListener;
-var m_window_addEventListener = window.addEventListener;
-var m_window_removeEventListener = window.removeEventListener;
+const m_document_addEventListener = document.addEventListener;
+const m_document_removeEventListener = document.removeEventListener;
+const m_window_addEventListener = window.addEventListener;
+const m_window_removeEventListener = window.removeEventListener;
 
 /**
  * Houses custom event handlers to intercept on document + window event listeners.
  */
-var documentEventHandlers = {},
+const documentEventHandlers = {},
     windowEventHandlers = {};
 
 document.addEventListener = function(evt, handler, capture) {
-    var e = evt.toLowerCase();
-    if (typeof documentEventHandlers[e] != 'undefined') {
+    let e = evt.toLowerCase();
+    if (typeof documentEventHandlers[e] !== 'undefined') {
         documentEventHandlers[e].subscribe(handler);
     } else {
         m_document_addEventListener.call(document, evt, handler, capture);
@@ -137,8 +139,8 @@ document.addEventListener = function(evt, handler, capture) {
 };
 
 window.addEventListener = function(evt, handler, capture) {
-    var e = evt.toLowerCase();
-    if (typeof windowEventHandlers[e] != 'undefined') {
+    let e = evt.toLowerCase();
+    if (typeof windowEventHandlers[e] !== 'undefined') {
         windowEventHandlers[e].subscribe(handler);
     } else {
         m_window_addEventListener.call(window, evt, handler, capture);
@@ -146,9 +148,9 @@ window.addEventListener = function(evt, handler, capture) {
 };
 
 document.removeEventListener = function(evt, handler, capture) {
-    var e = evt.toLowerCase();
+    let e = evt.toLowerCase();
     // If unsubscribing from an event that is handled by a plugin
-    if (typeof documentEventHandlers[e] != "undefined") {
+    if (typeof documentEventHandlers[e] !== "undefined") {
         documentEventHandlers[e].unsubscribe(handler);
     } else {
         m_document_removeEventListener.call(document, evt, handler, capture);
@@ -156,9 +158,9 @@ document.removeEventListener = function(evt, handler, capture) {
 };
 
 window.removeEventListener = function(evt, handler, capture) {
-    var e = evt.toLowerCase();
+    const e = evt.toLowerCase();
     // If unsubscribing from an event that is handled by a plugin
-    if (typeof windowEventHandlers[e] != "undefined") {
+    if (typeof windowEventHandlers[e] !== "undefined") {
         windowEventHandlers[e].unsubscribe(handler);
     } else {
         m_window_removeEventListener.call(window, evt, handler, capture);
@@ -166,7 +168,7 @@ window.removeEventListener = function(evt, handler, capture) {
 };
 
 function createEvent(type, data) {
-    var event = document.createEvent('Events');
+    const event = document.createEvent('Events');
     event.initEvent(type, false, false);
     if (data) {
         for (var i in data) {
@@ -179,7 +181,7 @@ function createEvent(type, data) {
 }
 
 
-var cordova = {
+let cordova = {
     define:define,
     require:require,
     version:PLATFORM_VERSION_BUILD_LABEL,
@@ -217,15 +219,15 @@ var cordova = {
      * bNoDetach is required for events which cause an exception which needs to be caught in native code
      */
     fireDocumentEvent: function(type, data, bNoDetach) {
-        var evt = createEvent(type, data);
-        if (typeof documentEventHandlers[type] != 'undefined') {
+        let evt = createEvent(type, data);
+        if (typeof documentEventHandlers[type] !== 'undefined') {
             if( bNoDetach ) {
                 documentEventHandlers[type].fire(evt);
             }
             else {
                 setTimeout(function() {
                     // Fire deviceready on listeners that were registered before cordova.js was loaded.
-                    if (type == 'deviceready') {
+                    if (type === 'deviceready') {
                         document.dispatchEvent(evt);
                     }
                     documentEventHandlers[type].fire(evt);
@@ -236,8 +238,8 @@ var cordova = {
         }
     },
     fireWindowEvent: function(type, data) {
-        var evt = createEvent(type,data);
-        if (typeof windowEventHandlers[type] != 'undefined') {
+        const evt = createEvent(type,data);
+        if (typeof windowEventHandlers[type] !== 'undefined') {
             setTimeout(function() {
                 windowEventHandlers[type].fire(evt);
             }, 0);
@@ -287,9 +289,9 @@ var cordova = {
      */
     callbackFromNative: function(callbackId, isSuccess, status, args, keepCallback) {
         try {
-            var callback = cordova.callbacks[callbackId];
+            const callback = cordova.callbacks[callbackId];
             if (callback) {
-                if (isSuccess && status == cordova.callbackStatus.OK) {
+                if (isSuccess && status === cordova.callbackStatus.OK) {
                     callback.success && callback.success.apply(null, args);
                 } else if (!isSuccess) {
                     callback.fail && callback.fail.apply(null, args);
@@ -308,7 +310,7 @@ var cordova = {
             }
         }
         catch (err) {
-            var msg = "Error in " + (isSuccess ? "Success" : "Error") + " callbackId: " + callbackId + " : " + err;
+            const msg = "Error in " + (isSuccess ? "Success" : "Error") + " callbackId: " + callbackId + " : " + err;
             console && console.log && console.log(msg);
             cordova.fireWindowEvent("cordovacallbackerror", { 'message': msg });
             throw err;
@@ -333,11 +335,11 @@ module.exports = cordova;
 // file: src/common/argscheck.js
 define("cordova/argscheck", function(require, exports, module) {
 
-var utils = require('cordova/utils');
+let utils = require('cordova/utils');
 
-var moduleExports = module.exports;
+const moduleExports = module.exports;
 
-var typeMap = {
+const typeMap = {
     'A': 'Array',
     'D': 'Date',
     'N': 'Number',
@@ -354,21 +356,21 @@ function checkArgs(spec, functionName, args, opt_callee) {
     if (!moduleExports.enableChecks) {
         return;
     }
-    var errMsg = null;
+    let errMsg = null;
     var typeName;
-    for (var i = 0; i < spec.length; ++i) {
-        var c = spec.charAt(i),
+    for (let i = 0; i < spec.length; ++i) {
+        let c = spec.charAt(i),
             cUpper = c.toUpperCase(),
             arg = args[i];
         // Asterix means allow anything.
-        if (c == '*') {
+        if (c === '*') {
             continue;
         }
         typeName = utils.typeName(arg);
-        if ((arg === null || arg === undefined) && c == cUpper) {
+        if ((arg === null || arg === undefined) && c === cUpper) {
             continue;
         }
-        if (typeName != typeMap[cUpper]) {
+        if (typeName !== typeMap[cUpper]) {
             errMsg = 'Expected ' + typeMap[cUpper];
             break;
         }
@@ -377,7 +379,7 @@ function checkArgs(spec, functionName, args, opt_callee) {
         errMsg += ', but got ' + typeName + '.';
         errMsg = 'Wrong type for parameter "' + extractParamName(opt_callee || args.callee, i) + '" of ' + functionName + ': ' + errMsg;
         // Don't log when running unit tests.
-        if (typeof jasmine == 'undefined') {
+        if (typeof jasmine === 'undefined') {
             console.error(errMsg);
         }
         throw TypeError(errMsg);
@@ -398,18 +400,18 @@ moduleExports.enableChecks = true;
 // file: src/common/base64.js
 define("cordova/base64", function(require, exports, module) {
 
-var base64 = exports;
+let base64 = exports;
 
 base64.fromArrayBuffer = function(arrayBuffer) {
-    var array = new Uint8Array(arrayBuffer);
+    let array = new Uint8Array(arrayBuffer);
     return uint8ToBase64(array);
 };
 
 base64.toArrayBuffer = function(str) {
-    var decodedStr = typeof atob != 'undefined' ? atob(str) : new Buffer(str,'base64').toString('binary');
-    var arrayBuffer = new ArrayBuffer(decodedStr.length);
-    var array = new Uint8Array(arrayBuffer);
-    for (var i=0, len=decodedStr.length; i < len; i++) {
+    const decodedStr = typeof atob !== 'undefined' ? atob(str) : new Buffer(str,'base64').toString('binary');
+    const arrayBuffer = new ArrayBuffer(decodedStr.length);
+    const array = new Uint8Array(arrayBuffer);
+    for (let i=0, len=decodedStr.length; i < len; i++) {
         array[i] = decodedStr.charCodeAt(i);
     }
     return arrayBuffer;
@@ -422,13 +424,13 @@ base64.toArrayBuffer = function(str) {
  * platforms tested.
  */
 
-var b64_6bit = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+const b64_6bit = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 var b64_12bit;
 
-var b64_12bitTable = function() {
+let b64_12bitTable = function() {
     b64_12bit = [];
-    for (var i=0; i<64; i++) {
-        for (var j=0; j<64; j++) {
+    for (let i=0; i<64; i++) {
+        for (let j=0; j<64; j++) {
             b64_12bit[i*64+j] = b64_6bit[i] + b64_6bit[j];
         }
     }
@@ -437,24 +439,24 @@ var b64_12bitTable = function() {
 };
 
 function uint8ToBase64(rawData) {
-    var numBytes = rawData.byteLength;
-    var output="";
+    const numBytes = rawData.byteLength;
+    const output="";
     var segment;
-    var table = b64_12bitTable();
-    for (var i=0;i<numBytes-2;i+=3) {
+    const table = b64_12bitTable();
+    for (let i=0;i<numBytes-2;i+=3) {
         segment = (rawData[i] << 16) + (rawData[i+1] << 8) + rawData[i+2];
         output += table[segment >> 12];
         output += table[segment & 0xfff];
     }
-    if (numBytes - i == 2) {
+    if (numBytes - i === 2) {
         segment = (rawData[i] << 16) + (rawData[i+1] << 8);
         output += table[segment >> 12];
         output += b64_6bit[(segment & 0xfff) >> 6];
         output += '=';
-    } else if (numBytes - i == 1) {
+    } else if (numBytes - i === 1) {
         segment = (rawData[i] << 16);
         output += table[segment >> 12];
-        output += '==';
+        output += '===';
     }
     return output;
 }
@@ -464,7 +466,7 @@ function uint8ToBase64(rawData) {
 // file: src/common/builder.js
 define("cordova/builder", function(require, exports, module) {
 
-var utils = require('cordova/utils');
+let utils = require('cordova/utils');
 
 function each(objects, func, context) {
     for (var prop in objects) {
@@ -476,7 +478,7 @@ function each(objects, func, context) {
 
 function clobber(obj, key, value) {
     exports.replaceHookForTesting(obj, key);
-    var needsProperty = false;
+    let needsProperty = false;
     try {
         obj[key] = value;
     } catch (e) {
@@ -506,7 +508,7 @@ function assignOrWrapInDeprecateGetter(obj, key, value, message) {
 function include(parent, objects, clobber, merge) {
     each(objects, function (obj, key) {
         try {
-            var result = obj.path ? require(obj.path) : {};
+            let result = obj.path ? require(obj.path) : {};
 
             if (clobber) {
                 // Clobber if it doesn't exist.
@@ -523,7 +525,7 @@ function include(parent, objects, clobber, merge) {
                 result = parent[key];
             } else {
                 // Overwrite if not currently defined.
-                if (typeof parent[key] == 'undefined') {
+                if (typeof parent[key] === 'undefined') {
                     assignOrWrapInDeprecateGetter(parent, key, result, obj.deprecated);
                 } else {
                     // Set result to what already exists, so we can build children into it if they exist.
@@ -582,7 +584,7 @@ exports.replaceHookForTesting = function() {};
 // file: src/common/channel.js
 define("cordova/channel", function(require, exports, module) {
 
-var utils = require('cordova/utils'),
+let utils = require('cordova/utils'),
     nextGuid = 1;
 
 /**
@@ -623,7 +625,7 @@ var utils = require('cordova/utils'),
  * @constructor
  * @param type  String the channel name
  */
-var Channel = function(type, sticky) {
+const Channel = function(type, sticky) {
     this.type = type;
     // Map of guid -> function.
     this.handlers = {};
@@ -643,12 +645,12 @@ var Channel = function(type, sticky) {
          * have been fired. All channels must be sticky channels.
          */
         join: function(h, c) {
-            var len = c.length,
+            let len = c.length,
                 i = len,
                 f = function() {
                     if (!(--i)) h();
                 };
-            for (var j=0; j<len; j++) {
+            for (let j=0; j<len; j++) {
                 if (c[j].state === 0) {
                     throw Error('Can only use join with sticky channels.');
                 }
@@ -678,7 +680,7 @@ var Channel = function(type, sticky) {
          */
         waitForInitialization: function(feature) {
             if (feature) {
-                var c = channel[feature] || this.createSticky(feature);
+                let c = channel[feature] || this.createSticky(feature);
                 this.deviceReadyChannelsMap[feature] = c;
                 this.deviceReadyChannelsArray.push(c);
             }
@@ -690,7 +692,7 @@ var Channel = function(type, sticky) {
          * @param feature {String}     The unique feature name
          */
         initializationComplete: function(feature) {
-            var c = this.deviceReadyChannelsMap[feature];
+            const c = this.deviceReadyChannelsMap[feature];
             if (c) {
                 c.fire();
             }
@@ -698,7 +700,7 @@ var Channel = function(type, sticky) {
     };
 
 function forceFunction(f) {
-    if (typeof f != 'function') throw "Function required as first argument!";
+    if (typeof f !== 'function') throw "Function required as first argument!";
 }
 
 /**
@@ -711,14 +713,14 @@ function forceFunction(f) {
 Channel.prototype.subscribe = function(f, c) {
     // need a function to call
     forceFunction(f);
-    if (this.state == 2) {
+    if (this.state === 2) {
         f.apply(c || this, this.fireArgs);
         return;
     }
 
-    var func = f,
+    let func = f,
         guid = f.observer_guid;
-    if (typeof c == "object") { func = utils.close(c, f); }
+    if (typeof c === "object") { func = utils.close(c, f); }
 
     if (!guid) {
         // first time any channel has seen this subscriber
@@ -731,7 +733,7 @@ Channel.prototype.subscribe = function(f, c) {
     if (!this.handlers[guid]) {
         this.handlers[guid] = func;
         this.numHandlers++;
-        if (this.numHandlers == 1) {
+        if (this.numHandlers === 1) {
             this.onHasSubscribersChange && this.onHasSubscribersChange();
         }
     }
@@ -744,7 +746,7 @@ Channel.prototype.unsubscribe = function(f) {
     // need a function to unsubscribe
     forceFunction(f);
 
-    var guid = f.observer_guid,
+    const guid = f.observer_guid,
         handler = this.handlers[guid];
     if (handler) {
         delete this.handlers[guid];
@@ -759,24 +761,24 @@ Channel.prototype.unsubscribe = function(f) {
  * Calls all functions subscribed to this channel.
  */
 Channel.prototype.fire = function(e) {
-    var fail = false,
+    const fail = false,
         fireArgs = Array.prototype.slice.call(arguments);
     // Apply stickiness.
-    if (this.state == 1) {
+    if (this.state === 1) {
         this.state = 2;
         this.fireArgs = fireArgs;
     }
     if (this.numHandlers) {
         // Copy the values first so that it is safe to modify it from within
         // callbacks.
-        var toCall = [];
+        const toCall = [];
         for (var item in this.handlers) {
             toCall.push(this.handlers[item]);
         }
-        for (var i = 0; i < toCall.length; ++i) {
+        for (let i = 0; i < toCall.length; ++i) {
             toCall[i].apply(this, fireArgs);
         }
-        if (this.state == 2 && this.numHandlers) {
+        if (this.state === 2 && this.numHandlers) {
             this.numHandlers = 0;
             this.handlers = {};
             this.onHasSubscribersChange && this.onHasSubscribersChange();
@@ -826,7 +828,7 @@ define("cordova/exec", function(require, exports, module) {
  * Creates a gap bridge iframe used to notify the native code about queued
  * commands.
  */
-var cordova = require('cordova'),
+let cordova = require('cordova'),
     utils = require('cordova/utils'),
     base64 = require('cordova/base64'),
     execIframe,
@@ -835,12 +837,12 @@ var cordova = require('cordova'),
     failSafeTimerId = 0;
 
 function massageArgsJsToNative(args) {
-    if (!args || utils.typeName(args) != 'Array') {
+    if (!args || utils.typeName(args) !== 'Array') {
         return args;
     }
-    var ret = [];
+    let ret = [];
     args.forEach(function(arg, i) {
-        if (utils.typeName(arg) == 'ArrayBuffer') {
+        if (utils.typeName(arg) === 'ArrayBuffer') {
             ret.push({
                 'CDVType': 'ArrayBuffer',
                 'data': base64.fromArrayBuffer(arg)
@@ -853,15 +855,15 @@ function massageArgsJsToNative(args) {
 }
 
 function massageMessageNativeToJs(message) {
-    if (message.CDVType == 'ArrayBuffer') {
-        var stringToArrayBuffer = function(str) {
-            var ret = new Uint8Array(str.length);
-            for (var i = 0; i < str.length; i++) {
+    if (message.CDVType === 'ArrayBuffer') {
+        const stringToArrayBuffer = function(str) {
+            const ret = new Uint8Array(str.length);
+            for (let i = 0; i < str.length; i++) {
                 ret[i] = str.charCodeAt(i);
             }
             return ret.buffer;
         };
-        var base64ToArrayBuffer = function(b64) {
+        const base64ToArrayBuffer = function(b64) {
             return stringToArrayBuffer(atob(b64));
         };
         message = base64ToArrayBuffer(message.data);
@@ -870,10 +872,10 @@ function massageMessageNativeToJs(message) {
 }
 
 function convertMessageToArgsNativeToJs(message) {
-    var args = [];
+    let args = [];
     if (!message || !message.hasOwnProperty('CDVType')) {
         args.push(message);
-    } else if (message.CDVType == 'MultiPart') {
+    } else if (message.CDVType === 'MultiPart') {
         message.messages.forEach(function(e) {
             args.push(massageMessageNativeToJs(e));
         });
@@ -886,7 +888,7 @@ function convertMessageToArgsNativeToJs(message) {
 function iOSExec() {
 
     var successCallback, failCallback, service, action, actionArgs;
-    var callbackId = null;
+    let callbackId = null;
     if (typeof arguments[0] !== 'string') {
         // FORMAT ONE
         successCallback = arguments[0];
@@ -919,7 +921,7 @@ function iOSExec() {
 
     actionArgs = massageArgsJsToNative(actionArgs);
 
-    var command = [callbackId, service, action, actionArgs];
+    let command = [callbackId, service, action, actionArgs];
 
     // Stringify and queue the command. We stringify to command now to
     // effectively clone the command arguments in case they are mutated before
@@ -930,14 +932,14 @@ function iOSExec() {
     // then the queue will be flushed when it returns; no need for a poke.
     // Also, if there is already a command in the queue, then we've already
     // poked the native side, so there is no reason to do so again.
-    if (!isInContextOfEvalJs && commandQueue.length == 1) {
+    if (!isInContextOfEvalJs && commandQueue.length === 1) {
         pokeNative();
     }
 }
 
 // CB-10530
 function proxyChanged() {
-    var cexec = cordovaExec();
+    let cexec = cordovaExec();
        
     return (execProxy !== cexec && // proxy objects are different
             iOSExec !== cexec      // proxy object is not the current iOSExec
@@ -947,14 +949,14 @@ function proxyChanged() {
 // CB-10106
 function handleBridgeChange() {
     if (proxyChanged()) {
-        var commandString = commandQueue.shift();
+        let commandString = commandQueue.shift();
         while(commandString) {
-            var command = JSON.parse(commandString);
-            var callbackId = command[0];
-            var service = command[1];
-            var action = command[2];
-            var actionArgs = command[3];
-            var callbacks = cordova.callbacks[callbackId] || {};
+            const command = JSON.parse(commandString);
+            const callbackId = command[0];
+            const service = command[1];
+            const action = command[2];
+            const actionArgs = command[3];
+            const callbacks = cordova.callbacks[callbackId] || {};
             
             execProxy(callbacks.success, callbacks.fail, service, action, actionArgs);
             
@@ -1009,15 +1011,15 @@ iOSExec.nativeFetchMessages = function() {
     if (!commandQueue.length) {
         return '';
     }
-    var json = '[' + commandQueue.join(',') + ']';
+    const json = '[' + commandQueue.join(',') + ']';
     commandQueue.length = 0;
     return json;
 };
 
 iOSExec.nativeCallback = function(callbackId, status, message, keepCallback, debug) {
     return iOSExec.nativeEvalAndFetch(function() {
-        var success = status === 0 || status === 1;
-        var args = convertMessageToArgsNativeToJs(message);
+        const success = status === 0 || status === 1;
+        let args = convertMessageToArgsNativeToJs(message);
         function nc2() {
             cordova.callbackFromNative(callbackId, success, status, args, keepCallback);
         }
@@ -1039,8 +1041,8 @@ iOSExec.nativeEvalAndFetch = function(func) {
 // Proxy the exec for bridge changes. See CB-10106
 
 function cordovaExec() {
-    var cexec = require('cordova/exec');
-    var cexec_valid = (typeof cexec.nativeFetchMessages === 'function') && (typeof cexec.nativeEvalAndFetch === 'function') && (typeof cexec.nativeCallback === 'function');
+    const cexec = require('cordova/exec');
+    const cexec_valid = (typeof cexec.nativeFetchMessages === 'function') && (typeof cexec.nativeEvalAndFetch === 'function') && (typeof cexec.nativeCallback === 'function');
     return (cexec_valid && execProxy !== cexec)? cexec : iOSExec;
 }
 
@@ -1069,7 +1071,7 @@ define("cordova/exec/proxy", function(require, exports, module) {
 
 
 // internal map of proxy function
-var CommandProxyMap = {};
+const CommandProxyMap = {};
 
 module.exports = {
 
@@ -1082,7 +1084,7 @@ module.exports = {
 
     // cordova.commandProxy.remove("Accelerometer");
     remove:function(id) {
-        var proxy = CommandProxyMap[id];
+        const proxy = CommandProxyMap[id];
         delete CommandProxyMap[id];
         CommandProxyMap[id] = null;
         return proxy;
@@ -1097,25 +1099,25 @@ module.exports = {
 // file: src/common/init.js
 define("cordova/init", function(require, exports, module) {
 
-var channel = require('cordova/channel');
-var cordova = require('cordova');
-var modulemapper = require('cordova/modulemapper');
-var platform = require('cordova/platform');
-var pluginloader = require('cordova/pluginloader');
-var utils = require('cordova/utils');
+let channel = require('cordova/channel');
+let cordova = require('cordova');
+let modulemapper = require('cordova/modulemapper');
+let platform = require('cordova/platform');
+let pluginloader = require('cordova/pluginloader');
+let utils = require('cordova/utils');
 
-var platformInitChannelsArray = [channel.onNativeReady, channel.onPluginsReady];
+let platformInitChannelsArray = [channel.onNativeReady, channel.onPluginsReady];
 
 function logUnfiredChannels(arr) {
-    for (var i = 0; i < arr.length; ++i) {
-        if (arr[i].state != 2) {
+    for (let i = 0; i < arr.length; ++i) {
+        if (arr[i].state !== 2) {
             console.log('Channel not fired: ' + arr[i].type);
         }
     }
 }
 
 window.setTimeout(function() {
-    if (channel.onDeviceReady.state != 2) {
+    if (channel.onDeviceReady.state !== 2) {
         console.log('deviceready has not fired after 5 seconds.');
         logUnfiredChannels(platformInitChannelsArray);
         logUnfiredChannels(channel.deviceReadyChannelsArray);
@@ -1125,14 +1127,14 @@ window.setTimeout(function() {
 // Replace navigator before any modules are required(), to ensure it happens as soon as possible.
 // We replace it so that properties that can't be clobbered can instead be overridden.
 function replaceNavigator(origNavigator) {
-    var CordovaNavigator = function() {};
+    let CordovaNavigator = function() {};
     CordovaNavigator.prototype = origNavigator;
-    var newNavigator = new CordovaNavigator();
+    let newNavigator = new CordovaNavigator();
     // This work-around really only applies to new APIs that are newer than Function.bind.
     // Without it, APIs such as getGamepads() break.
     if (CordovaNavigator.bind) {
         for (var key in origNavigator) {
-            if (typeof origNavigator[key] == 'function') {
+            if (typeof origNavigator[key] === 'function') {
                 newNavigator[key] = origNavigator[key].bind(origNavigator);
             }
             else {
@@ -1169,7 +1171,7 @@ channel.onActivated = cordova.addDocumentEventHandler('activated');
 channel.onDeviceReady = cordova.addStickyDocumentEventHandler('deviceready');
 
 // Listen for DOMContentLoaded and notify our channel subscribers.
-if (document.readyState == 'complete' || document.readyState == 'interactive') {
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
     channel.onDOMContentLoaded.fire();
 } else {
     document.addEventListener('DOMContentLoaded', function() {
@@ -1225,28 +1227,28 @@ channel.join(function() {
 // file: src/common/init_b.js
 define("cordova/init_b", function(require, exports, module) {
 
-var channel = require('cordova/channel');
-var cordova = require('cordova');
-var modulemapper = require('cordova/modulemapper');
-var platform = require('cordova/platform');
-var pluginloader = require('cordova/pluginloader');
-var utils = require('cordova/utils');
+const channel = require('cordova/channel');
+let cordova = require('cordova');
+let modulemapper = require('cordova/modulemapper');
+const platform = require('cordova/platform');
+const pluginloader = require('cordova/pluginloader');
+let utils = require('cordova/utils');
 
-var platformInitChannelsArray = [channel.onDOMContentLoaded, channel.onNativeReady, channel.onPluginsReady];
+const platformInitChannelsArray = [channel.onDOMContentLoaded, channel.onNativeReady, channel.onPluginsReady];
 
 // setting exec
 cordova.exec = require('cordova/exec');
 
 function logUnfiredChannels(arr) {
-    for (var i = 0; i < arr.length; ++i) {
-        if (arr[i].state != 2) {
+    for (let i = 0; i < arr.length; ++i) {
+        if (arr[i].state !== 2) {
             console.log('Channel not fired: ' + arr[i].type);
         }
     }
 }
 
 window.setTimeout(function() {
-    if (channel.onDeviceReady.state != 2) {
+    if (channel.onDeviceReady.state !== 2) {
         console.log('deviceready has not fired after 5 seconds.');
         logUnfiredChannels(platformInitChannelsArray);
         logUnfiredChannels(channel.deviceReadyChannelsArray);
@@ -1256,14 +1258,14 @@ window.setTimeout(function() {
 // Replace navigator before any modules are required(), to ensure it happens as soon as possible.
 // We replace it so that properties that can't be clobbered can instead be overridden.
 function replaceNavigator(origNavigator) {
-    var CordovaNavigator = function() {};
+    const CordovaNavigator = function() {};
     CordovaNavigator.prototype = origNavigator;
-    var newNavigator = new CordovaNavigator();
+    const newNavigator = new CordovaNavigator();
     // This work-around really only applies to new APIs that are newer than Function.bind.
     // Without it, APIs such as getGamepads() break.
     if (CordovaNavigator.bind) {
         for (var key in origNavigator) {
-            if (typeof origNavigator[key] == 'function') {
+            if (typeof origNavigator[key] === 'function') {
                 newNavigator[key] = origNavigator[key].bind(origNavigator);
             }
             else {
@@ -1299,7 +1301,7 @@ channel.onActivated = cordova.addDocumentEventHandler('activated');
 channel.onDeviceReady = cordova.addStickyDocumentEventHandler('deviceready');
 
 // Listen for DOMContentLoaded and notify our channel subscribers.
-if (document.readyState == 'complete' || document.readyState == 'interactive') {
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
     channel.onDOMContentLoaded.fire();
 } else {
     document.addEventListener('DOMContentLoaded', function() {
@@ -1350,7 +1352,7 @@ channel.join(function() {
 // file: src/common/modulemapper.js
 define("cordova/modulemapper", function(require, exports, module) {
 
-var builder = require('cordova/builder'),
+let builder = require('cordova/builder'),
     moduleMap = define.moduleMap,
     symbolList,
     deprecationMap;
@@ -1391,37 +1393,37 @@ function prepareNamespace(symbolPath, context) {
     if (!symbolPath) {
         return context;
     }
-    var parts = symbolPath.split('.');
-    var cur = context;
-    for (var i = 0, part; part = parts[i]; ++i) {
+    let parts = symbolPath.split('.');
+    let cur = context;
+    for (let i = 0, part; part = parts[i]; ++i) {
         cur = cur[part] = cur[part] || {};
     }
     return cur;
 }
 
 exports.mapModules = function(context) {
-    var origSymbols = {};
+    let origSymbols = {};
     context.CDV_origSymbols = origSymbols;
-    for (var i = 0, len = symbolList.length; i < len; i += 3) {
-        var strategy = symbolList[i];
-        var moduleName = symbolList[i + 1];
-        var module = require(moduleName);
+    for (let i = 0, len = symbolList.length; i < len; i += 3) {
+        let strategy = symbolList[i];
+        let moduleName = symbolList[i + 1];
+        let module = require(moduleName);
         // <runs/>
-        if (strategy == 'r') {
+        if (strategy === 'r') {
             continue;
         }
-        var symbolPath = symbolList[i + 2];
-        var lastDot = symbolPath.lastIndexOf('.');
-        var namespace = symbolPath.substr(0, lastDot);
-        var lastName = symbolPath.substr(lastDot + 1);
+        let symbolPath = symbolList[i + 2];
+        let lastDot = symbolPath.lastIndexOf('.');
+        let namespace = symbolPath.substr(0, lastDot);
+        let lastName = symbolPath.substr(lastDot + 1);
 
-        var deprecationMsg = symbolPath in deprecationMap ? 'Access made to deprecated symbol: ' + symbolPath + '. ' + deprecationMsg : null;
-        var parentObj = prepareNamespace(namespace, context);
-        var target = parentObj[lastName];
+        let deprecationMsg = symbolPath in deprecationMap ? 'Access made to deprecated symbol: ' + symbolPath + '. ' + deprecationMsg : null;
+        let parentObj = prepareNamespace(namespace, context);
+        let target = parentObj[lastName];
 
-        if (strategy == 'm' && target) {
+        if (strategy === 'm' && target) {
             builder.recursiveMerge(target, module);
-        } else if ((strategy == 'd' && !target) || (strategy != 'd')) {
+        } else if ((strategy === 'd' && !target) || (strategy !== 'd')) {
             if (!(symbolPath in origSymbols)) {
                 origSymbols[symbolPath] = target;
             }
@@ -1431,13 +1433,13 @@ exports.mapModules = function(context) {
 };
 
 exports.getOriginalSymbol = function(context, symbolPath) {
-    var origSymbols = context.CDV_origSymbols;
+    let origSymbols = context.CDV_origSymbols;
     if (origSymbols && (symbolPath in origSymbols)) {
         return origSymbols[symbolPath];
     }
-    var parts = symbolPath.split('.');
-    var obj = context;
-    for (var i = 0; i < parts.length; ++i) {
+    let parts = symbolPath.split('.');
+    let obj = context;
+    for (let i = 0; i < parts.length; ++i) {
         obj = obj && obj[parts[i]];
     }
     return obj;
@@ -1451,7 +1453,7 @@ exports.reset();
 // file: src/common/modulemapper_b.js
 define("cordova/modulemapper_b", function(require, exports, module) {
 
-var builder = require('cordova/builder'),
+const builder = require('cordova/builder'),
     symbolList = [],
     deprecationMap;
 
@@ -1488,37 +1490,37 @@ function prepareNamespace(symbolPath, context) {
     if (!symbolPath) {
         return context;
     }
-    var parts = symbolPath.split('.');
-    var cur = context;
-    for (var i = 0, part; part = parts[i]; ++i) {
+    let parts = symbolPath.split('.');
+    let cur = context;
+    for (let i = 0, part; part = parts[i]; ++i) {
         cur = cur[part] = cur[part] || {};
     }
     return cur;
 }
 
 exports.mapModules = function(context) {
-    var origSymbols = {};
+    let origSymbols = {};
     context.CDV_origSymbols = origSymbols;
-    for (var i = 0, len = symbolList.length; i < len; i += 3) {
-        var strategy = symbolList[i];
-        var moduleName = symbolList[i + 1];
-        var module = require(moduleName);
+    for (let i = 0, len = symbolList.length; i < len; i += 3) {
+        const strategy = symbolList[i];
+        const moduleName = symbolList[i + 1];
+        let module = require(moduleName);
         // <runs/>
-        if (strategy == 'r') {
+        if (strategy === 'r') {
             continue;
         }
-        var symbolPath = symbolList[i + 2];
-        var lastDot = symbolPath.lastIndexOf('.');
-        var namespace = symbolPath.substr(0, lastDot);
-        var lastName = symbolPath.substr(lastDot + 1);
+        const symbolPath = symbolList[i + 2];
+        const lastDot = symbolPath.lastIndexOf('.');
+        const namespace = symbolPath.substr(0, lastDot);
+        const lastName = symbolPath.substr(lastDot + 1);
 
-        var deprecationMsg = symbolPath in deprecationMap ? 'Access made to deprecated symbol: ' + symbolPath + '. ' + deprecationMsg : null;
-        var parentObj = prepareNamespace(namespace, context);
-        var target = parentObj[lastName];
+        const deprecationMsg = symbolPath in deprecationMap ? 'Access made to deprecated symbol: ' + symbolPath + '. ' + deprecationMsg : null;
+        const parentObj = prepareNamespace(namespace, context);
+        const target = parentObj[lastName];
 
-        if (strategy == 'm' && target) {
+        if (strategy === 'm' && target) {
             builder.recursiveMerge(target, module);
-        } else if ((strategy == 'd' && !target) || (strategy != 'd')) {
+        } else if ((strategy === 'd' && !target) || (strategy !== 'd')) {
             if (!(symbolPath in origSymbols)) {
                 origSymbols[symbolPath] = target;
             }
@@ -1528,13 +1530,13 @@ exports.mapModules = function(context) {
 };
 
 exports.getOriginalSymbol = function(context, symbolPath) {
-    var origSymbols = context.CDV_origSymbols;
+    const origSymbols = context.CDV_origSymbols;
     if (origSymbols && (symbolPath in origSymbols)) {
         return origSymbols[symbolPath];
     }
-    var parts = symbolPath.split('.');
-    var obj = context;
-    for (var i = 0; i < parts.length; ++i) {
+    const parts = symbolPath.split('.');
+    let obj = context;
+    for (let i = 0; i < parts.length; ++i) {
         obj = obj && obj[parts[i]];
     }
     return obj;
@@ -1561,13 +1563,13 @@ module.exports = {
 // file: src/common/pluginloader.js
 define("cordova/pluginloader", function(require, exports, module) {
 
-var modulemapper = require('cordova/modulemapper');
-var urlutil = require('cordova/urlutil');
+let modulemapper = require('cordova/modulemapper');
+const urlutil = require('cordova/urlutil');
 
 // Helper function to inject a <script> tag.
 // Exported for testing.
 exports.injectScript = function(url, onload, onerror) {
-    var script = document.createElement("script");
+    const script = document.createElement("script");
     // onload fires even when script fails loads with an error.
     script.onload = onload;
     // onerror fires for malformed URLs.
@@ -1593,15 +1595,15 @@ function injectIfNecessary(id, url, onload, onerror) {
 
 function onScriptLoadingComplete(moduleList, finishPluginLoading) {
     // Loop through all the plugins and then through their clobbers and merges.
-    for (var i = 0, module; module = moduleList[i]; i++) {
+    for (let i = 0, module; module = moduleList[i]; i++) {
         if (module.clobbers && module.clobbers.length) {
-            for (var j = 0; j < module.clobbers.length; j++) {
+            for (let j = 0; j < module.clobbers.length; j++) {
                 modulemapper.clobbers(module.id, module.clobbers[j]);
             }
         }
 
         if (module.merges && module.merges.length) {
-            for (var k = 0; k < module.merges.length; k++) {
+            for (let k = 0; k < module.merges.length; k++) {
                 modulemapper.merges(module.id, module.merges[k]);
             }
         }
@@ -1621,7 +1623,7 @@ function onScriptLoadingComplete(moduleList, finishPluginLoading) {
 // Otherwise the onerror response handler will just call finishPluginLoading().
 function handlePluginsObject(path, moduleList, finishPluginLoading) {
     // Now inject the scripts.
-    var scriptCounter = moduleList.length;
+    const scriptCounter = moduleList.length;
 
     if (!scriptCounter) {
         finishPluginLoading();
@@ -1633,18 +1635,18 @@ function handlePluginsObject(path, moduleList, finishPluginLoading) {
         }
     }
 
-    for (var i = 0; i < moduleList.length; i++) {
+    for (let i = 0; i < moduleList.length; i++) {
         injectIfNecessary(moduleList[i].id, path + moduleList[i].file, scriptLoadedCallback);
     }
 }
 
 function findCordovaPath() {
-    var path = null;
-    var scripts = document.getElementsByTagName('script');
-    var term = '/cordova.js';
-    for (var n = scripts.length-1; n>-1; n--) {
-        var src = scripts[n].src.replace(/\?.*$/, ''); // Strip any query param (CB-6007).
-        if (src.indexOf(term) == (src.length - term.length)) {
+    let path = null;
+    const scripts = document.getElementsByTagName('script');
+    const term = '/cordova.js';
+    for (let n = scripts.length-1; n>-1; n--) {
+        const src = scripts[n].src.replace(/\?.*$/, ''); // Strip any query param (CB-6007).
+        if (src.indexOf(term) === (src.length - term.length)) {
             path = src.substring(0, src.length - term.length) + '/';
             break;
         }
@@ -1656,13 +1658,13 @@ function findCordovaPath() {
 // This is an async process, but onDeviceReady is blocked on onPluginsReady.
 // onPluginsReady is fired when there are no plugins to load, or they are all done.
 exports.load = function(callback) {
-    var pathPrefix = findCordovaPath();
+    let pathPrefix = findCordovaPath();
     if (pathPrefix === null) {
         console.log('Could not find cordova.js script tag. Plugin loading may fail.');
         pathPrefix = '';
     }
     injectIfNecessary('cordova/plugin_list', pathPrefix + 'cordova_plugins.js', function() {
-        var moduleList = require("cordova/plugin_list");
+        let moduleList = require("cordova/plugin_list");
         handlePluginsObject(pathPrefix, moduleList, callback);
     }, callback);
 };
@@ -1673,7 +1675,7 @@ exports.load = function(callback) {
 // file: src/common/pluginloader_b.js
 define("cordova/pluginloader_b", function(require, exports, module) {
 
-var modulemapper = require('cordova/modulemapper');
+const modulemapper = require('cordova/modulemapper');
 
 // Handler for the cordova_plugins.js content.
 // See plugman's plugin_loader.js for the details of this object.
@@ -1684,15 +1686,15 @@ function handlePluginsObject(moduleList) {
     }
 
     // Loop through all the modules and then through their clobbers and merges.
-    for (var i = 0, module; module = moduleList[i]; i++) {
+    for (let i = 0, module; module = moduleList[i]; i++) {
         if (module.clobbers && module.clobbers.length) {
-            for (var j = 0; j < module.clobbers.length; j++) {
+            for (let j = 0; j < module.clobbers.length; j++) {
                 modulemapper.clobbers(module.id, module.clobbers[j]);
             }
         }
 
         if (module.merges && module.merges.length) {
-            for (var k = 0; k < module.merges.length; k++) {
+            for (let k = 0; k < module.merges.length; k++) {
                 modulemapper.merges(module.id, module.merges[k]);
             }
         }
@@ -1709,7 +1711,7 @@ function handlePluginsObject(moduleList) {
 // onDeviceReady is blocked on onPluginsReady. onPluginsReady is fired when there are
 // no plugins to load, or they are all done.
 exports.load = function(callback) {
-    var moduleList = require("cordova/plugin_list");
+    const moduleList = require("cordova/plugin_list");
     handlePluginsObject(moduleList);
 
     callback();
@@ -1727,7 +1729,7 @@ define("cordova/urlutil", function(require, exports, module) {
  * For relative URLs, converts them to absolute ones.
  */
 exports.makeAbsolute = function makeAbsolute(url) {
-    var anchorEl = document.createElement('a');
+    const anchorEl = document.createElement('a');
     anchorEl.href = url;
     return anchorEl.href;
 };
@@ -1738,14 +1740,14 @@ exports.makeAbsolute = function makeAbsolute(url) {
 // file: src/common/utils.js
 define("cordova/utils", function(require, exports, module) {
 
-var utils = exports;
+const utils = exports;
 
 /**
  * Defines a property getter / setter for obj[key].
  */
 utils.defineGetterSetter = function(obj, key, getFunc, opt_setFunc) {
     if (Object.defineProperty) {
-        var desc = {
+        const desc = {
             get: getFunc,
             configurable: true
         };
@@ -1770,9 +1772,9 @@ utils.arrayIndexOf = function(a, item) {
     if (a.indexOf) {
         return a.indexOf(item);
     }
-    var len = a.length;
-    for (var i = 0; i < len; ++i) {
-        if (a[i] == item) {
+    const len = a.length;
+    for (let i = 0; i < len; ++i) {
+        if (a[i] === item) {
             return i;
         }
     }
@@ -1783,11 +1785,11 @@ utils.arrayIndexOf = function(a, item) {
  * Returns whether the item was found in the array.
  */
 utils.arrayRemove = function(a, item) {
-    var index = utils.arrayIndexOf(a, item);
-    if (index != -1) {
+    const index = utils.arrayIndexOf(a, item);
+    if (index !== -1) {
         a.splice(index, 1);
     }
-    return index != -1;
+    return index !== -1;
 };
 
 utils.typeName = function(val) {
@@ -1798,7 +1800,7 @@ utils.typeName = function(val) {
  * Returns an indication of whether the argument is an array or not
  */
 utils.isArray = Array.isArray ||
-                function(a) {return utils.typeName(a) == 'Array';};
+                function(a) {return utils.typeName(a) === 'Array';};
 
 /**
  * Returns an indication of whether the argument is a Date or not
@@ -1811,7 +1813,7 @@ utils.isDate = function(d) {
  * Does a deep clone of the object.
  */
 utils.clone = function(obj) {
-    if(!obj || typeof obj == 'function' || utils.isDate(obj) || typeof obj != 'object') {
+    if(!obj || typeof obj === 'function' || utils.isDate(obj) || typeof obj !== 'object') {
         return obj;
     }
 
@@ -1827,7 +1829,7 @@ utils.clone = function(obj) {
 
     retVal = {};
     for(i in obj){
-        if(!(i in retVal) || retVal[i] != obj[i]) {
+        if(!(i in retVal) || retVal[i] !== obj[i]) {
             retVal[i] = utils.clone(obj[i]);
         }
     }
@@ -1839,17 +1841,17 @@ utils.clone = function(obj) {
  */
 utils.close = function(context, func, params) {
     return function() {
-        var args = params || arguments;
+        const args = params || arguments;
         return func.apply(context, args);
     };
 };
 
 //------------------------------------------------------------------------------
 function UUIDcreatePart(length) {
-    var uuidpart = "";
-    for (var i=0; i<length; i++) {
-        var uuidchar = parseInt((Math.random() * 256), 10).toString(16);
-        if (uuidchar.length == 1) {
+    const uuidpart = "";
+    for (let i=0; i<length; i++) {
+        let uuidchar = parseInt((Math.random() * 256), 10).toString(16);
+        if (uuidchar.length === 1) {
             uuidchar = "0" + uuidchar;
         }
         uuidpart += uuidchar;
@@ -1875,7 +1877,7 @@ utils.createUUID = function() {
  */
 utils.extend = (function() {
     // proxy used to establish prototype chain
-    var F = function() {};
+    const F = function() {};
     // extend Child from Parent
     return function(Child, Parent) {
 

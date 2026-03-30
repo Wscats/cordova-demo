@@ -1,3 +1,5 @@
+'use strict';
+
 /*
        Licensed to the Apache Software Foundation (ASF) under one
        or more contributor license agreements.  See the NOTICE file
@@ -19,12 +21,12 @@
 
 /*jshint node: true*/
 
-var PlatformJson = require('cordova-common').PlatformJson;
-var PlatformMunger = require('cordova-common').ConfigChanges.PlatformMunger;
-var PluginInfoProvider = require('cordova-common').PluginInfoProvider;
+const PlatformJson = require('cordova-common').PlatformJson;
+const PlatformMunger = require('cordova-common').ConfigChanges.PlatformMunger;
+const PluginInfoProvider = require('cordova-common').PluginInfoProvider;
 
 //shared PlatformMunger instance
-var _instance = null;
+let _instance = null;
 
 module.exports = {
 

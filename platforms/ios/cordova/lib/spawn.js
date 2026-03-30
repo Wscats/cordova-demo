@@ -1,3 +1,5 @@
+'use strict';
+
 /*
        Licensed to the Apache Software Foundation (ASF) under one
        or more contributor license agreements.  See the NOTICE file
@@ -19,7 +21,7 @@
 
 /*jshint node: true*/
 
-var Q    = require('q'),
+const Q    = require('q'),
     proc = require('child_process');
 
 /**
@@ -31,9 +33,9 @@ var Q    = require('q'),
  * @return {Promise}              Promise either fullfilled or rejected with error code
  */
 module.exports = function(cmd, args, opt_cwd) {
-    var d = Q.defer();
+    const d = Q.defer();
     try {
-        var child = proc.spawn(cmd, args, {cwd: opt_cwd, stdio: 'inherit'});
+        const child = proc.spawn(cmd, args, {cwd: opt_cwd, stdio: 'inherit'});
 
         child.on('exit', function(code) {
             if (code) {

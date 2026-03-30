@@ -1,3 +1,5 @@
+'use strict';
+
 /**
     Licensed to the Apache Software Foundation (ASF) under one
     or more contributor license agreements.  See the NOTICE file
@@ -19,15 +21,15 @@
 
 /*jslint node: true */
 
-var fs = require('fs');
-var path = require('path');
-var unorm = require('unorm');
-var projectFile = require('./lib/projectFile');
+const fs = require('fs');
+const path = require('path');
+const unorm = require('unorm');
+const projectFile = require('./lib/projectFile');
 
-var CordovaError = require('cordova-common').CordovaError;
-var CordovaLogger = require('cordova-common').CordovaLogger;
-var events = require('cordova-common').events;
-var PluginManager = require('cordova-common').PluginManager;
+const CordovaError = require('cordova-common').CordovaError;
+const CordovaLogger = require('cordova-common').CordovaLogger;
+const events = require('cordova-common').events;
+const PluginManager = require('cordova-common').PluginManager;
 
 function setupEvents(externalEventEmitter) {
     if (externalEventEmitter) {
@@ -68,7 +70,7 @@ function Api(platform, platformRootDir, events) {
             throw new CordovaError('The provided path "' + this.root + '" is not a Cordova iOS project.');
         }
 
-        var cordovaProjName = xcodeProjDir.substring(xcodeProjDir.lastIndexOf(path.sep)+1, xcodeProjDir.indexOf('.xcodeproj'));
+        const cordovaProjName = xcodeProjDir.substring(xcodeProjDir.lastIndexOf(path.sep)+1, xcodeProjDir.indexOf('.xcodeproj'));
         xcodeCordovaProj = path.join(this.root, cordovaProjName);
     } catch(e) {
         throw new CordovaError('The provided path "'+this.root+'" is not a Cordova iOS project.');
@@ -114,14 +116,14 @@ Api.createPlatform = function (destination, config, options, events) {
     // CB-6992 it is necessary to normalize characters
     // because node and shell scripts handles unicode symbols differently
     // We need to normalize the name to NFD form since iOS uses NFD unicode form
-    var name = unorm.nfd(config.name());
+    let name = unorm.nfd(config.name());
 
     return require('../../../lib/create')
     .createProject(destination, config.packageName(), name, options)
     .then(function () {
         // after platform is created we return Api instance based on new Api.js location
         // This is required to correctly resolve paths in the future api calls
-        var PlatformApi = require(path.resolve(destination, 'cordova/Api'));
+        let PlatformApi = require(path.resolve(destination, 'cordova/Api'));
         return new PlatformApi('ios', destination, events);
     });
 };
@@ -148,7 +150,7 @@ Api.updatePlatform = function (destination, options, events) {
     return require('../../../lib/create')
     .updateProject(destination, options)
     .then(function () {
-        var PlatformApi = require(path.resolve(destination, 'cordova/Api'));
+        const PlatformApi = require(path.resolve(destination, 'cordova/Api'));
         return new PlatformApi('ios', destination, events);
     });
 };
@@ -160,7 +162,7 @@ Api.updatePlatform = function (destination, options, events) {
  *   platform's file structure and other properties of platform.
  */
 Api.prototype.getPlatformInfo = function () {
-    var result = {};
+    const result = {};
     result.locations = this.locations;
     result.root = this.root;
     result.name = this.platform;
@@ -206,7 +208,7 @@ Api.prototype.prepare = function (cordovaProject) {
  *   CordovaError instance.
  */
 Api.prototype.addPlugin = function (plugin, installOptions) {
-    var xcodeproj = projectFile.parse(this.locations);
+    let xcodeproj = projectFile.parse(this.locations);
 
     installOptions = installOptions || {};
     installOptions.variables = installOptions.variables || {};
@@ -237,7 +239,7 @@ Api.prototype.addPlugin = function (plugin, installOptions) {
  */
 Api.prototype.removePlugin = function (plugin, uninstallOptions) {
 
-    var xcodeproj = projectFile.parse(this.locations);
+    const xcodeproj = projectFile.parse(this.locations);
     return PluginManager.get(this.platform, this.locations, xcodeproj)
         .removePlugin(plugin, uninstallOptions)
         // CB-11022 return non-falsy value to indicate
@@ -278,7 +280,7 @@ Api.prototype.removePlugin = function (plugin, uninstallOptions) {
  *   CordovaError instance.
  */
 Api.prototype.build = function (buildOptions) {
-    var self = this;
+    let self = this;
     return require('./lib/check_reqs').run()
     .then(function () {
         return require('./lib/build').run.call(self, buildOptions);
@@ -298,7 +300,7 @@ Api.prototype.build = function (buildOptions) {
  *   successfully, or rejected with CordovaError.
  */
 Api.prototype.run = function(runOptions) {
-    var self = this;
+    let self = this;
     return require('./lib/check_reqs').run()
     .then(function () {
         return require('./lib/run').run.call(self, runOptions);
@@ -312,7 +314,7 @@ Api.prototype.run = function(runOptions) {
  *   CordovaError.
  */
 Api.prototype.clean = function(cleanOptions) {
-    var self = this;
+    const self = this;
     return require('./lib/check_reqs').run()
     .then(function () {
         return require('./lib/clean').run.call(self, cleanOptions);

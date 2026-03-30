@@ -1,3 +1,5 @@
+'use strict';
+
 /**
     Licensed to the Apache Software Foundation (ASF) under one
     or more contributor license agreements.  See the NOTICE file
@@ -17,7 +19,7 @@
     under the License.
 */
 
-var CordovaLogger = require('cordova-common').CordovaLogger;
+const CordovaLogger = require('cordova-common').CordovaLogger;
 
 module.exports = {
     adjustLoggerLevel: function (opts) {
